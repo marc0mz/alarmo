@@ -116,6 +116,13 @@ class AlarmoPanelAccessView(HomeAssistantView):
     url = "/api/alarmo/panel_access"
     name = "api:alarmo:panel_access"
 
+    async def get(self, request):
+        """Return the configured Alarmo panel access list."""
+        _require_panel_admin(request)
+        hass = request.app["hass"]
+        coordinator = hass.data[const.DOMAIN]["coordinator"]
+        return self.json({"user_ids": coordinator.store.async_get_panel_admin_users()})
+
     @RequestDataValidator(vol.Schema({
         vol.Required("user_ids"): vol.All(cv.ensure_list, [cv.string])
     }))
@@ -124,22 +131,14 @@ class AlarmoPanelAccessView(HomeAssistantView):
         _require_panel_admin(request)
         hass = request.app["hass"]
         coordinator = hass.data[const.DOMAIN]["coordinator"]
-        user_ids = data["user_ids"]
-        valid_user_ids = [user.id for user in hass.auth.async_get_users() if user.id]
-        invalid = sorted(set(user_ids) - set(valid_user_ids))
+        user_ids = list(dict.fromkeys(data["user_ids"]))
+        valid_user_ids = {user.id for user in hass.auth.async_get_users()}
+        invalid = sorted(set(user_ids) - valid_user_ids)
         if invalid:
             raise vol.Invalid("Unknown Home Assistant user")
         coordinator.store.async_set_panel_admin_users(user_ids)
         async_dispatcher_send(hass, "alarmo_panel_access_updated")
         return self.json({"success": True})
-
-    async def get(self, request):
-        """Return the configured Alarmo panel access list."""
-        _require_panel_admin(request)
-        hass = request.app["hass"]
-        coordinator = hass.data[const.DOMAIN]["coordinator"]
-        return self.json({"user_ids": coordinator.store.async_get_panel_admin_users()})
-
 
 class AlarmoConfigView(HomeAssistantView):
     """Login to Home Assistant cloud."""
