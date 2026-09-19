@@ -150,6 +150,7 @@ export class AlarmViewCodes extends SubscribeMixin(LitElement) {
         </ha-card>
 
         ${this.usersPanel()}
+        ${this.panelAccessPanel()}
       `;
     }
   }
