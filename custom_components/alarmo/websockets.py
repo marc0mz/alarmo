@@ -58,6 +58,27 @@ from .sensors import (
 )
 
 
+def _is_panel_admin(hass, user_id: str | None) -> bool:
+    """Return whether the Home Assistant user may administer Alarmo."""
+    if not user_id:
+        return False
+    user = hass.auth.async_get_user(user_id)
+    if user is None:
+        return False
+    if user.is_admin:
+        return True
+    coordinator = hass.data[const.DOMAIN]["coordinator"]
+    return user_id in coordinator.store.async_get_panel_admin_users()
+
+
+def _require_panel_admin(request) -> None:
+    """Raise when the current Home Assistant user is not an Alarmo admin."""
+    hass = request.app["hass"]
+    user = request.get("hass_user")
+    user_id = user.id if user else None
+    if not _is_panel_admin(hass, user_id):
+        raise vol.Invalid("Not authorized to administer Alarmo")
+
 @callback
 @decorators.websocket_command(
     {
@@ -67,6 +88,10 @@ from .sensors import (
 @decorators.async_response
 async def handle_subscribe_updates(hass, connection, msg):
     """Handle subscribe updates."""
+
+    if not _is_panel_admin(hass, connection.user.id if connection.user else None):
+        connection.send_error(msg["id"], "unauthorized", "Not authorized to administer Alarmo")
+        return
 
     @callback
     def async_handle_event():
