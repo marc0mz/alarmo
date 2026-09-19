@@ -207,8 +207,8 @@ class AlarmoConfigView(HomeAssistantView):
             }
         )
     )
-    _require_panel_admin(request)
     async def post(self, request, data):
+        _require_panel_admin(request)
         """Handle config update request."""
         hass = request.app["hass"]
         coordinator = hass.data[const.DOMAIN]["coordinator"]
@@ -250,8 +250,8 @@ class AlarmoAreaView(HomeAssistantView):
             }
         )
     )
-    _require_panel_admin(request)
     async def post(self, request, data):
+        _require_panel_admin(request)
         """Handle config update request."""
         hass = request.app["hass"]
         coordinator = hass.data[const.DOMAIN]["coordinator"]
@@ -299,8 +299,8 @@ class AlarmoSensorView(HomeAssistantView):
             }
         )
     )
-    _require_panel_admin(request)
     async def post(self, request, data):
+        _require_panel_admin(request)
         """Handle config update request."""
         hass = request.app["hass"]
         coordinator = hass.data[const.DOMAIN]["coordinator"]
@@ -335,8 +335,8 @@ class AlarmoUserView(HomeAssistantView):
             }
         )
     )
-    _require_panel_admin(request)
     async def post(self, request, data):
+        _require_panel_admin(request)
         """Handle config update request."""
         hass = request.app["hass"]
         coordinator = hass.data[const.DOMAIN]["coordinator"]
@@ -403,8 +403,8 @@ class AlarmoAutomationView(HomeAssistantView):
             }
         )
     )
-    _require_panel_admin(request)
     async def post(self, request, data):
+        _require_panel_admin(request)
         """Handle config update request."""
         hass = request.app["hass"]
         coordinator = hass.data[const.DOMAIN]["coordinator"]
@@ -437,8 +437,8 @@ class AlarmoSensorGroupView(HomeAssistantView):
             }
         )
     )
-    _require_panel_admin(request)
     async def post(self, request, data):
+        _require_panel_admin(request)
         """Handle config update request."""
         hass = request.app["hass"]
         coordinator = hass.data[const.DOMAIN]["coordinator"]
