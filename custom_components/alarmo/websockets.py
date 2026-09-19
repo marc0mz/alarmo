@@ -71,6 +71,7 @@ def _is_panel_admin(hass, user_id: str | None) -> bool:
     return user_id in coordinator.store.async_get_panel_admin_users()
 
 
+
 def _require_panel_admin(request) -> None:
     """Raise when the current Home Assistant user is not an Alarmo admin."""
     hass = request.app["hass"]
@@ -107,6 +108,37 @@ async def handle_subscribe_updates(hass, connection, msg):
         hass, "alarmo_update_frontend", async_handle_event
     )
     connection.send_result(msg["id"])
+
+
+class AlarmoPanelAccessView(HomeAssistantView):
+    """Manage Home Assistant users allowed to administer Alarmo."""
+
+    url = "/api/alarmo/panel_access"
+    name = "api:alarmo:panel_access"
+
+    @RequestDataValidator(vol.Schema({
+        vol.Required("user_ids"): vol.All(cv.ensure_list, [cv.string])
+    }))
+    async def post(self, request, data):
+        """Update the Alarmo panel access list."""
+        _require_panel_admin(request)
+        hass = request.app["hass"]
+        coordinator = hass.data[const.DOMAIN]["coordinator"]
+        user_ids = data["user_ids"]
+        valid_user_ids = [user.id for user in hass.auth.async_get_users() if user.id]
+        invalid = sorted(set(user_ids) - set(valid_user_ids))
+        if invalid:
+            raise vol.Invalid("Unknown Home Assistant user")
+        coordinator.store.async_set_panel_admin_users(user_ids)
+        async_dispatcher_send(hass, "alarmo_panel_access_updated")
+        return self.json({"success": True})
+
+    async def get(self, request):
+        """Return the configured Alarmo panel access list."""
+        _require_panel_admin(request)
+        hass = request.app["hass"]
+        coordinator = hass.data[const.DOMAIN]["coordinator"]
+        return self.json({"user_ids": coordinator.store.async_get_panel_admin_users()})
 
 
 class AlarmoConfigView(HomeAssistantView):
@@ -533,6 +565,7 @@ def websocket_get_ready_to_arm_modes(hass, connection, msg):
 async def async_register_websockets(hass):
     """Register websocket handlers."""
     hass.http.register_view(AlarmoConfigView)
+    hass.http.register_view(AlarmoPanelAccessView)
     hass.http.register_view(AlarmoSensorView)
     hass.http.register_view(AlarmoUserView)
     hass.http.register_view(AlarmoAutomationView)
