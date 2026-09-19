@@ -33,6 +33,9 @@ export class AlarmViewCodes extends SubscribeMixin(LitElement) {
   @property()
   users: Dictionary<AlarmoUser> = {};
 
+  @property()
+  panelAccessUsers: string[] = [];
+
   public hassSubscribe(): Promise<UnsubscribeFunc>[] {
     this._fetchData();
     return [this.hass!.connection.subscribeMessage(() => this._fetchData(), { type: 'alarmo_config_updated' })];
@@ -47,6 +50,7 @@ export class AlarmViewCodes extends SubscribeMixin(LitElement) {
 
     const users = await fetchUsers(this.hass);
     this.users = users;
+    this.panelAccessUsers = await fetchAlarmoPanelUsers(this.hass);
   }
 
   render() {
