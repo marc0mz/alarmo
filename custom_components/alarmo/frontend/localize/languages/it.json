@@ -408,7 +408,8 @@
           "description": "Seleziona gli utenti di Home Assistant che possono amministrare il pannello Alarmo. Gli amministratori di Home Assistant hanno sempre accesso.",
           "actions": {
             "save": "Salva"
-          }
+          },
+          "denied": "Non sei autorizzato ad amministrare il pannello Alarmo."
         }
       }
     },
