@@ -207,6 +207,7 @@ class AlarmoConfigView(HomeAssistantView):
             }
         )
     )
+    _require_panel_admin(request)
     async def post(self, request, data):
         """Handle config update request."""
         hass = request.app["hass"]
@@ -249,6 +250,7 @@ class AlarmoAreaView(HomeAssistantView):
             }
         )
     )
+    _require_panel_admin(request)
     async def post(self, request, data):
         """Handle config update request."""
         hass = request.app["hass"]
@@ -297,6 +299,7 @@ class AlarmoSensorView(HomeAssistantView):
             }
         )
     )
+    _require_panel_admin(request)
     async def post(self, request, data):
         """Handle config update request."""
         hass = request.app["hass"]
@@ -332,6 +335,7 @@ class AlarmoUserView(HomeAssistantView):
             }
         )
     )
+    _require_panel_admin(request)
     async def post(self, request, data):
         """Handle config update request."""
         hass = request.app["hass"]
@@ -399,6 +403,7 @@ class AlarmoAutomationView(HomeAssistantView):
             }
         )
     )
+    _require_panel_admin(request)
     async def post(self, request, data):
         """Handle config update request."""
         hass = request.app["hass"]
@@ -432,6 +437,7 @@ class AlarmoSensorGroupView(HomeAssistantView):
             }
         )
     )
+    _require_panel_admin(request)
     async def post(self, request, data):
         """Handle config update request."""
         hass = request.app["hass"]
